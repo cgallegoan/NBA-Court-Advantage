@@ -7,3 +7,5 @@ El estudio ha sido realizado mediante gráficos en Tableau y Plotly (R). Los dat
 
 ### [Tableau Dashboard](https://public.tableau.com/app/profile/carlos.gallego.andreu/viz/NBA-Aquequiposlesafectamselfactorcancha/Dashboard1)
 ### [Vídeo explicación de resultados](https://drive.google.com/file/d/13gq0KXKcKa9z8FKarYPT_srdmTyz1Oe_/view?usp=sharing)
+
+Trabajo realizado junto a Daniel Oliver Belando
