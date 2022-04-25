@@ -1,0 +1,82 @@
+---
+title: "Trabajo académico"
+author: "Daniel Oliver & Carlos Gallego"
+date: "12/24/2021"
+output: html_document
+---
+
+# Datos
+
+```{r Datos, include=FALSE}
+list.of.packages <- c("plotly", "dplyr", "crosstalk")
+lapply(list.of.packages, require, character.only=TRUE)
+
+
+library(readr)
+ranking <- read_csv("ranking.csv", 
+    col_types = cols(STANDINGSDATE = col_date(format = "%Y-%m-%d"), 
+        RETURNTOPLAY = col_skip()))
+games <- read_csv("games.csv", 
+    col_types = cols(GAME_DATE_EST = col_date(format = "%Y-%m-%d")
+        ))
+
+```
+
+## Creando un subconjunto
+
+
+```{r}
+
+g82 = ranking[grepl('-07-20$', ranking$STANDINGSDATE),]
+g82$HOME = gsub("-", "", substring(g82$HOME_RECORD, 1, last = 2))
+g82$AWAY = gsub("-", "", substring(g82$ROAD_RECORD, 1, last = 2))
+g82$STANDINGSDATE = substring(g82$STANDINGSDATE, 1, last = 4)
+
+g82 = g82[,c(4,5,6,13,14)]
+
+g82[,1]<- as.numeric(unlist(g82[,1]))
+g82[,4]<- as.numeric(unlist(g82[,4]))
+g82[,5]<- as.numeric(unlist(g82[,5]))
+
+```
+
+
+```{r}
+
+
+
+tx <- highlight_key(g82)
+
+widgets <- bscols(width=12,
+                  list(
+                    filter_select("TEAM", "TEAMS", tx,~TEAM),
+                    filter_slider("HOME", "Wins", tx,~HOME,width="100%"),
+                    filter_checkbox("STANDINGSDATE", "Year", tx,~STANDINGSDATE, inline=TRUE))
+                  )
+
+gl <- plot_ly(tx, x=~STANDINGSDATE, y=~HOME, showlegend=FALSE) %>% 
+  add_lines(color=~TEAM)%>% layout(yaxis = list(range = c(0,41))) %>% add_trace(y = mean(g82$HOME), mode = 'lines')
+
+gl2 <- plot_ly(tx, x=~STANDINGSDATE, y=~AWAY, showlegend=FALSE) %>% 
+  add_lines(color=~TEAM) %>% layout(yaxis = list(range = c(0,41))) %>% add_trace(y = mean(g82$AWAY), mode = 'lines')
+
+bscols(widths=c(4,4,4),widgets,gl, gl2)
+
+
+
+
+```
+
+
+```{r}
+
+g82$VC = g82$HOME / (g82$AWAY + g82$HOME) * 100
+g82$VF = g82$AWAY / (g82$AWAY + g82$HOME) * 100
+g82$DC = (41 - g82$HOME) / (41 - g82$AWAY + 41 - g82$HOME) *100
+g82$DF = (41 - g82$AWAY) / (41 - g82$AWAY + 41 - g82$HOME) *100
+names(games)[names(games) == "HOME_TEAM_ID"] <- "TEAM_ID"
+names(games)[names(games) == "SEASON"] <- "STANDINGSDATE"
+final = merge(g82,games, by = c("TEAM_ID", "STANDINGSDATE"))
+write.csv(final,"final.csv", row.names = FALSE)
+```
+
