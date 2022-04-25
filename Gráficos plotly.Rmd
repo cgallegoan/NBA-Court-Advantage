@@ -1,5 +1,5 @@
 ---
-title: "Trabajo académico"
+title: "Análisis de la ventaja de campo en la NBA"
 author: "Daniel Oliver & Carlos Gallego"
 date: "12/24/2021"
 output: html_document
